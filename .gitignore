@@ -78,6 +78,9 @@ series
 cscope.*
 ncscope.*
 
+# initramfs/initrd stuff
+initramfs.cpio
+
 # gnu global files
 GPATH
 GRTAGS

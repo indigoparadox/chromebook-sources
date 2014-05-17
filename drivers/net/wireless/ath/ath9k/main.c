@@ -906,7 +906,7 @@ void ath_rx_poll_work(unsigned long data)
 
 	ar9003_hw_dump_ani_reg(ah);
 
-	ath_dbg(common, RX_STUCK,
+	/*ath_dbg(common, RX_STUCK,
 		"%8s: %10u\n", "RXLP", sc->debug.stats.istats.rxlp);
 	ath_dbg(common, RX_STUCK,
 		"%8s: %10u\n", "RXHP", sc->debug.stats.istats.rxhp);
@@ -932,7 +932,7 @@ void ath_rx_poll_work(unsigned long data)
 	ath_dbg(common, RX_STUCK,
 		"%8s: %10u\n", "CST", sc->debug.stats.istats.cst);
 	ath_dbg(common, RX_STUCK,
-		"%8s: %10u\n", "GTT", sc->debug.stats.istats.gtt);
+		"%8s: %10u\n", "GTT", sc->debug.stats.istats.gtt);*/
 
 	ath_dbg(common, RX_STUCK, "Noise floor dump:\n");
 	ath_dbg(common, RX_STUCK,
