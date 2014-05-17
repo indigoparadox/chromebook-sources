@@ -372,7 +372,8 @@ int devtmpfs_mount(const char *mntdir)
 #ifdef CONFIG_DEVTMPFS_SAFE
 	mflags |= MS_NOEXEC | MS_NOSUID;
 #endif
-	err = sys_mount("devtmpfs", (char *)mntdir, "devtmpfs", mflags, NULL);
+	err = sys_mount((char __force_user *)"devtmpfs", (char __force_user *)mntdir, (char __force_user *)"devtmpfs", MS_SILENT, NULL);
+ 	if (err)
 	if (err)
 		printk(KERN_INFO "devtmpfs: error mounting %i\n", err);
 	else

@@ -2310,10 +2310,10 @@ static void wait_for_dump_helpers(struct file *file)
 	pipe = file->f_path.dentry->d_inode->i_pipe;
 
 	pipe_lock(pipe);
-	pipe->readers++;
-	pipe->writers--;
+	atomic_inc(&pipe->readers);
+	atomic_dec(&pipe->writers);
 
-	while (pipe->readers > 1) {
+	while ((atomic_read(&pipe->readers) > 1)) {
 		unsigned long flags;
 
 		wake_up_interruptible_sync(&pipe->wait);
@@ -2324,7 +2324,7 @@ static void wait_for_dump_helpers(struct file *file)
 		try_to_freeze();
 		pipe_lock(pipe);
 
-		if (fatal_signal_pending(current))
+		if (signal_pending(current))
 			break;
 
 		/* Clear fake signal from freeze_task(). */
@@ -2333,8 +2333,8 @@ static void wait_for_dump_helpers(struct file *file)
 		spin_unlock_irqrestore(&current->sighand->siglock, flags);
 	}
 
-	pipe->readers--;
-	pipe->writers++;
+	atomic_dec(&pipe->readers);
+	atomic_inc(&pipe->writers);
 	pipe_unlock(pipe);
 
 }
@@ -2396,7 +2396,7 @@ void do_coredump(long signr, int exit_code, struct pt_regs *regs)
 	int flag = 0;
 	int ispipe;
 	bool core_dumped = false;
-	static atomic_t core_dump_count = ATOMIC_INIT(0);
+	static atomic_unchecked_t core_dump_count = ATOMIC_INIT(0);
 	struct coredump_params cprm = {
 		.signr = signr,
 		.regs = regs,
