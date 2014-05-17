@@ -1706,7 +1706,7 @@ fail:
  */
 void *__vmalloc_node_range(unsigned long size, unsigned long align,
 			unsigned long start, unsigned long end, gfp_t gfp_mask,
-			pgprot_t prot, int node, const void *caller)
+			pgprot_t prot, int node, const void *caller) __size_overflow(1)
 {
 	struct vm_struct *area;
 	void *addr;
