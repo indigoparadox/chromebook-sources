@@ -129,7 +129,7 @@ static DEFINE_SPINLOCK(idr_lock);
  *	    which we beg off on and pass to do_sys_settimeofday().
  */
 
-static struct k_clock posix_clocks[MAX_CLOCKS];
+static struct k_clock *posix_clocks[MAX_CLOCKS];
 
 /*
  * These ones are defined below.
@@ -241,7 +241,7 @@ static int posix_get_system_trace(const clockid_t which_clock,
  */
 static __init int init_posix_timers(void)
 {
-	struct k_clock clock_realtime = {
+	static struct k_clock clock_realtime = {
 		.clock_getres	= hrtimer_get_res,
 		.clock_get	= posix_clock_realtime_get,
 		.clock_set	= posix_clock_realtime_set,
@@ -253,7 +253,7 @@ static __init int init_posix_timers(void)
 		.timer_get	= common_timer_get,
 		.timer_del	= common_timer_del,
 	};
-	struct k_clock clock_monotonic = {
+	static struct k_clock clock_monotonic = {
 		.clock_getres	= hrtimer_get_res,
 		.clock_get	= posix_ktime_get_ts,
 		.nsleep		= common_nsleep,
@@ -263,19 +263,19 @@ static __init int init_posix_timers(void)
 		.timer_get	= common_timer_get,
 		.timer_del	= common_timer_del,
 	};
-	struct k_clock clock_monotonic_raw = {
+	static struct k_clock clock_monotonic_raw = {
 		.clock_getres	= hrtimer_get_res,
 		.clock_get	= posix_get_monotonic_raw,
 	};
-	struct k_clock clock_realtime_coarse = {
+	static struct k_clock clock_realtime_coarse = {
 		.clock_getres	= posix_get_coarse_res,
 		.clock_get	= posix_get_realtime_coarse,
 	};
-	struct k_clock clock_monotonic_coarse = {
+	static struct k_clock clock_monotonic_coarse = {
 		.clock_getres	= posix_get_coarse_res,
 		.clock_get	= posix_get_monotonic_coarse,
 	};
-	struct k_clock clock_boottime = {
+	static struct k_clock clock_boottime = {
 		.clock_getres	= hrtimer_get_res,
 		.clock_get	= posix_get_boottime,
 		.nsleep		= common_nsleep,
@@ -492,7 +492,7 @@ void posix_timers_register_clock(const clockid_t clock_id,
 		return;
 	}
 
-	posix_clocks[clock_id] = *new_clock;
+	posix_clocks[clock_id] = new_clock;
 }
 EXPORT_SYMBOL_GPL(posix_timers_register_clock);
 
@@ -538,9 +538,9 @@ static struct k_clock *clockid_to_kclock(const clockid_t id)
 		return (id & CLOCKFD_MASK) == CLOCKFD ?
 			&clock_posix_dynamic : &clock_posix_cpu;
 
-	if (id >= MAX_CLOCKS || !posix_clocks[id].clock_getres)
+	if (id >= MAX_CLOCKS || !posix_clocks[id] || !posix_clocks[id]->clock_getres)
 		return NULL;
-	return &posix_clocks[id];
+	return posix_clocks[id];
 }
 
 static int common_timer_create(struct k_itimer *new_timer)

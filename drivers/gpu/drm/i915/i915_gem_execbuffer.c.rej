@@ -1,0 +1,14 @@
+--- drivers/gpu/drm/i915/i915_gem_execbuffer.c	2012-05-21 11:33:01.339927870 +0200
++++ drivers/gpu/drm/i915/i915_gem_execbuffer.c	2012-05-21 12:10:10.076048918 +0200
+@@ -933,9 +933,9 @@
+ 
+ static int
+ validate_exec_list(struct drm_i915_gem_exec_object2 *exec,
+-		   int count)
++		   unsigned int count)
+ {
+-	int i;
++	unsigned int i;
+ 
+ 	for (i = 0; i < count; i++) {
+ 		char __user *ptr = (char __user *)(uintptr_t)exec[i].relocs_ptr;

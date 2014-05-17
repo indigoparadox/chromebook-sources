@@ -1,0 +1,23 @@
+--- include/linux/vmalloc.h	2012-03-19 10:39:11.388049209 +0100
++++ include/linux/vmalloc.h	2012-05-22 15:28:31.531384607 +0200
+@@ -14,6 +14,11 @@
+ #define VM_USERMAP	0x00000008	/* suitable for remap_vmalloc_range */
+ #define VM_VPAGES	0x00000010	/* buffer for pages was vmalloc'ed */
+ #define VM_UNLIST	0x00000020	/* vm_struct is not listed in vmlist */
++
++#if defined(CONFIG_MODULES) && defined(CONFIG_X86) && defined(CONFIG_PAX_KERNEXEC)
++#define VM_KERNEXEC	0x00000040	/* allocate from executable kernel memory range */
++#endif
++
+ /* bits [20..32] reserved for arch specific ioremap internals */
+ 
+ /*
+@@ -62,7 +67,7 @@
+ extern void *__vmalloc(unsigned long size, gfp_t gfp_mask, pgprot_t prot);
+ extern void *__vmalloc_node_range(unsigned long size, unsigned long align,
+ 			unsigned long start, unsigned long end, gfp_t gfp_mask,
+-			pgprot_t prot, int node, void *caller);
++			pgprot_t prot, int node, void *caller) __size_overflow(1);
+ extern void vfree(const void *addr);
+ 
+ extern void *vmap(struct page **pages, unsigned int count,

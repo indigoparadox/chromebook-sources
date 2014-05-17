@@ -1,0 +1,19 @@
+--- arch/x86/kernel/vsyscall_64.c	2012-05-21 11:32:57.687927672 +0200
++++ arch/x86/kernel/vsyscall_64.c	2012-05-21 12:10:09.648048895 +0200
+@@ -54,15 +54,13 @@
+ DEFINE_VVAR(int, vgetcpu_mode);
+ DEFINE_VVAR(struct vsyscall_gtod_data, vsyscall_gtod_data);
+ 
+-static enum { EMULATE, NATIVE, NONE } vsyscall_mode = EMULATE;
++static enum { EMULATE, NONE } vsyscall_mode = EMULATE;
+ 
+ static int __init vsyscall_setup(char *str)
+ {
+ 	if (str) {
+ 		if (!strcmp("emulate", str))
+ 			vsyscall_mode = EMULATE;
+-		else if (!strcmp("native", str))
+-			vsyscall_mode = NATIVE;
+ 		else if (!strcmp("none", str))
+ 			vsyscall_mode = NONE;
+ 		else

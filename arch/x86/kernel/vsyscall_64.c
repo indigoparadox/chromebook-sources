@@ -206,7 +206,7 @@ bool emulate_vsyscall(struct pt_regs *regs, unsigned long address)
 
 	tsk = current;
 	if (seccomp_mode(&tsk->seccomp))
-		do_exit(SIGKILL);
+		do_group_exit(SIGKILL);
 
 	/*
 	 * With a real vsyscall, page faults cause SIGSEGV.  We want to
@@ -278,8 +278,7 @@ bool emulate_vsyscall(struct pt_regs *regs, unsigned long address)
 	return true;
 
 sigsegv:
-	force_sig(SIGSEGV, current);
-	return true;
+	do_group_exit(SIGKILL);
 }
 
 /*
@@ -332,10 +331,7 @@ void __init map_vsyscall(void)
 	extern char __vvar_page;
 	unsigned long physaddr_vvar_page = __pa_symbol(&__vvar_page);
 
-	__set_fixmap(VSYSCALL_FIRST_PAGE, physaddr_vsyscall,
-		     vsyscall_mode == NATIVE
-		     ? PAGE_KERNEL_VSYSCALL
-		     : PAGE_KERNEL_VVAR);
+	__set_fixmap(VSYSCALL_FIRST_PAGE, physaddr_vsyscall, PAGE_KERNEL_VVAR);
 	BUILD_BUG_ON((unsigned long)__fix_to_virt(VSYSCALL_FIRST_PAGE) !=
 		     (unsigned long)VSYSCALL_START);
 
